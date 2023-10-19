@@ -18,7 +18,6 @@ export default function App() {
       sound: true,
     });
 
- 
     console.log('Authorization status:', authStatus);
     getFCMToken();
   };
@@ -28,57 +27,56 @@ export default function App() {
   };
 
   const getFCMToken = async () => {
-      try {
-        const fcmToken = await messaging().getToken();
-        console.log('fcmToken: ', fcmToken);
-        if (fcmToken) {
-          setDeviceToken(fcmToken);
-        }
-      } catch (error) {
-        console.log('🚀 ~ getFCMToken ~ error', error);
+    try {
+      const fcmToken = await messaging().getToken();
+      console.log('fcmToken: ', fcmToken);
+      if (fcmToken) {
+        setDeviceToken(fcmToken);
       }
+    } catch (error) {
+      console.log('🚀 ~ getFCMToken ~ error', error);
+    }
   };
 
   useEffect(() => {
     registerAppWithFCM();
     requestUserPermission();
 
-    messaging().onNotificationOpenedApp(async remoteMessage => {
+    messaging().onNotificationOpenedApp(async (remoteMessage) => {
       console.log('🚀background state  remoteMessage', remoteMessage);
     });
 
     messaging()
       .getInitialNotification()
-      .then(async remoteMessage => {
+      .then(async (remoteMessage) => {
         if (remoteMessage) {
           console.log(
             '🚀 Notification caused app to open quit state',
-            remoteMessage,
+            remoteMessage
           );
         }
       });
 
-    messaging().onMessage(async remoteMessage => {
+    messaging().onMessage(async (remoteMessage) => {
       console.log('foreground state  remoteMessage', remoteMessage);
     });
-
   }, []);
 
   useEffect(() => {
     PushNotification.createChannel(
       {
-        channelId: "channel-id", // (required)
-        channelName: "My channel", // (required)
-        channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
+        channelId: 'channel-id', // (required)
+        channelName: 'My channel', // (required)
+        channelDescription: 'A channel to categorise your notifications', // (optional) default: undefined.
         playSound: false, // (optional) default: true
-        soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+        soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
       (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
     );
 
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       if (Platform.OS === 'android') {
         PushNotification.localNotification({
           channelId: 'fcm_fallback_notification_channel',
@@ -120,15 +118,9 @@ export default function App() {
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
       <StatusBar style="auto" />
-      <Button
-        title="Local Notification"
-        onPress={localNotification}
-      />
+      <Button title="Local Notification" onPress={localNotification} />
 
-      <Button
-        title="Schedule Notification"
-        onPress={scheduleNotification}
-      />
+      <Button title="Schedule Notification" onPress={scheduleNotification} />
     </View>
   );
 }
